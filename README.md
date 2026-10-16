@@ -20,7 +20,7 @@ Modern web architecture relies heavily on microservices—small, independent ser
 * It starts a high-precision timer.
 * It verifies that the key exists and is marked as active.
 * It lets the endpoint run and complete.
-* It stops the timer, calculates response latency in milliseconds, and writes a log entry (Key ID, Endpoint, HTTP Status Code, Latency, Timestamp) to the MySQL database.
+* It stops the timer, calculates response latency in milliseconds, and writes a log entry (Key ID, Endpoint, HTTP Status Code, Latency, Timestamp) to the configured SQLAlchemy database (local MySQL or production PostgreSQL).
 
 
 4. **Data Aggregation with Pandas:** When an Admin opens their dashboard, the backend doesn't run slow, heavy database queries. Instead, it streams raw log records into a **Pandas DataFrame** in Python memory. Pandas computes average latency, peak speed, and HTTP status code counts (e.g., HTTP 200 Success vs. HTTP 401 Unauthorized) across all users in milliseconds.
@@ -88,12 +88,23 @@ The backend reads the root `.env`; Vite reads environment files inside
 `frontend`. The checked-in `.env.example` files contain only placeholders and
 are safe to commit. Keep actual `.env` / `.env.local` files private.
 
-For local work, the backend should use a local MySQL URL and
-`DATABASE_SSL=false`. The frontend automatically uses `http://localhost:8000`
-while running `vite`; alternatively, copy `frontend/.env.example` to
-`frontend/.env.local` and set `VITE_API_URL` there. In Vercel, keep
-`VITE_API_URL` set to the Render API URL. In Render, keep its Aiven
-`DATABASE_URL`; SSL remains automatic for non-local database hosts.
+For local work, keep the existing MySQL URL in the root `.env`, for example
+`mysql+pymysql://user:password@localhost:3306/apimetric_db`. The backend reads
+`DATABASE_URL` from that file and keeps local MySQL SSL disabled with
+`DATABASE_SSL=false`. PostgreSQL deployments use the same setting name; set
+Neon's PostgreSQL connection string as `DATABASE_URL` in Render, including
+`?sslmode=require` as provided by Neon. The application supports both
+`postgresql://` and legacy `postgres://` URLs.
+
+For Render, select Docker as the runtime, set the Dockerfile path to
+`backend/Dockerfile` with the repository root as the build context, and provide
+`DATABASE_URL`, `SECRET_KEY`, `ADMIN_REGISTER_KEY`, and `CORS_ORIGINS` as Render
+environment variables. The container binds Uvicorn to `0.0.0.0` and uses
+Render's `PORT` value. Do not add the local `.env` file to the image.
+
+The frontend automatically uses `http://localhost:8000` while running `vite`;
+alternatively, copy `frontend/.env.example` to `frontend/.env.local` and set
+`VITE_API_URL` there. In Vercel, set `VITE_API_URL` to the Render API URL.
 
 If the virtual environment reports that its Python executable is missing,
 recreate it only after installing a supported Python version (3.12 or 3.13):
