@@ -19,13 +19,13 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
     };
 
     return (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
             <div>
-                <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-                    <Play className="w-5 h-5 text-emerald-400" />
+                <h2 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
+                    <Play className="w-5 h-5 text-emerald-700" />
                     <span>API Execution Console</span>
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                     Select an API key from your list, trigger service endpoints, and view live JSON payloads.
                 </p>
             </div>
@@ -34,7 +34,7 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
                 <select
                     value={selectedKey}
                     onChange={(e) => setSelectedKey(e.target.value)}
-                    className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-indigo-300 font-mono focus:outline-none focus:border-indigo-500"
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm text-indigo-700 font-mono focus:outline-none focus:border-indigo-500"
                 >
                     <option value="">-- Select API Key --</option>
                     {keys.map((k) => (
@@ -44,40 +44,40 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-900 border border-slate-700/60 p-4 rounded-lg flex flex-col justify-between space-y-3">
+                <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col justify-between space-y-3">
                     <div>
-                        <h4 className="font-semibold text-white text-sm">Weather API</h4>
-                        <p className="text-xs text-slate-400">GET /api/v1/weather</p>
+                        <h4 className="font-semibold text-gray-900 text-sm">Weather API</h4>
+                        <p className="text-xs text-gray-500">GET /api/v1/weather</p>
                     </div>
                     <button
                         onClick={() => handleTestEndpoint('/api/v1/weather')}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-indigo-400 font-medium text-xs py-2 rounded border border-slate-700 transition"
+                        className="w-full bg-white hover:bg-gray-100 text-indigo-700 font-medium text-xs py-2 rounded border border-gray-200 transition"
                     >
                         Execute Weather Service
                     </button>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-700/60 p-4 rounded-lg flex flex-col justify-between space-y-3">
+                <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col justify-between space-y-3">
                     <div>
-                        <h4 className="font-semibold text-white text-sm">Stock API</h4>
-                        <p className="text-xs text-slate-400">GET /api/v1/stock</p>
+                        <h4 className="font-semibold text-gray-900 text-sm">Stock API</h4>
+                        <p className="text-xs text-gray-500">GET /api/v1/stock</p>
                     </div>
                     <button
                         onClick={() => handleTestEndpoint('/api/v1/stock')}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-medium text-xs py-2 rounded border border-slate-700 transition"
+                        className="w-full bg-white hover:bg-gray-100 text-emerald-700 font-medium text-xs py-2 rounded border border-gray-200 transition"
                     >
                         Execute Stock Service
                     </button>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-700/60 p-4 rounded-lg flex flex-col justify-between space-y-3">
+                <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col justify-between space-y-3">
                     <div>
-                        <h4 className="font-semibold text-white text-sm">Currency API</h4>
-                        <p className="text-xs text-slate-400">GET /api/v1/currency</p>
+                        <h4 className="font-semibold text-gray-900 text-sm">Currency API</h4>
+                        <p className="text-xs text-gray-500">GET /api/v1/currency</p>
                     </div>
                     <button
                         onClick={() => handleTestEndpoint('/api/v1/currency')}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 font-medium text-xs py-2 rounded border border-slate-700 transition"
+                        className="w-full bg-white hover:bg-gray-100 text-indigo-700 font-medium text-xs py-2 rounded border border-gray-200 transition"
                     >
                         Execute Currency Service
                     </button>
@@ -85,8 +85,8 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
             </div>
 
             {apiResponse && (
-                <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs text-slate-300">
-                    <p className="text-slate-500 mb-2">// Response Payload</p>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 font-mono text-xs text-gray-700">
+                    <p className="text-gray-500 mb-2">// Response Payload</p>
                     <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
                 </div>
             )}

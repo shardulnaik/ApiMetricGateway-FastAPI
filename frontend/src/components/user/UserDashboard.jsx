@@ -35,7 +35,7 @@ export default function UserDashboard() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100">
+        <div className="min-h-screen bg-gray-50 text-gray-900">
             <Navbar />
             <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
                 <KeyList keys={keys} onGenerateKey={handleGenerateKey} />
