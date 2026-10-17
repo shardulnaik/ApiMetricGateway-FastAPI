@@ -13,7 +13,7 @@ export default function UserDashboard() {
             const res = await getUserKeys();
             setKeys(res.data);
             if (res.data.length > 0 && !selectedKey) {
-                setSelectedKey(res.data[0].key);
+                setSelectedKey(String(res.data.find((key) => key.is_active)?.id || ''));
             }
         } catch (err) {
             console.error(err);
@@ -23,8 +23,8 @@ export default function UserDashboard() {
     const handleGenerateKey = async () => {
         try {
             const res = await generateUserKey();
-            setSelectedKey(res.data.key);
-            fetchKeys();
+            setKeys((current) => [res.data, ...current]);
+            setSelectedKey(String(res.data.id));
         } catch (err) {
             console.error(err);
         }

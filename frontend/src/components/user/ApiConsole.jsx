@@ -11,7 +11,12 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
             return;
         }
         try {
-            const res = await executeTestEndpoint(endpoint, selectedKey);
+            const key = keys.find((item) => String(item.id) === selectedKey);
+            if (!key?.is_active) {
+                setApiResponse({ error: 'Select an active API key.' });
+                return;
+            }
+            const res = await executeTestEndpoint(endpoint, key.key);
             setApiResponse(res.data);
         } catch (err) {
             setApiResponse(err.response?.data || { error: 'Request Failed' });
@@ -37,8 +42,8 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
                     className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm text-indigo-700 font-mono focus:outline-none focus:border-indigo-500"
                 >
                     <option value="">-- Select API Key --</option>
-                    {keys.map((k) => (
-                        <option key={k.id} value={k.key}>{k.key}</option>
+                    {keys.filter((k) => k.is_active).map((k) => (
+                        <option key={k.id} value={String(k.id)}>API ID {k.id}</option>
                     ))}
                 </select>
             </div>
