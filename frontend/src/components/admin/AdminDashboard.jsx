@@ -7,6 +7,7 @@ import KeyManagementTable from './KeyManagementTable';
 import { getAdminSummary, revokeKey } from '../../services/adminService';
 
 export default function AdminDashboard() {
+    const [showKeyConsole, setShowKeyConsole] = useState(false);
     const [adminSummary, setAdminSummary] = useState({
         total_system_users: 0,
         total_keys_issued: 0,
@@ -40,9 +41,13 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900">
-            <Navbar />
-            <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Navbar onSectionToggle={() => setShowKeyConsole((current) => !current)} sectionLabel={showKeyConsole ? 'Analytics' : 'User Key Console'} />
+            <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
+                {showKeyConsole ? (
+                    <KeyManagementTable userActivity={adminSummary.user_activity} onRevokeKey={handleRevoke} />
+                ) : (
+                <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
                     <StatCard title="Total Users" value={adminSummary.total_system_users} icon={Users} color="indigo" />
                     <StatCard title="Active API Keys" value={adminSummary.total_keys_issued} icon={Key} color="indigo" />
                     <StatCard title="Global Requests" value={adminSummary.total_system_requests} icon={Server} color="emerald" />
@@ -50,11 +55,8 @@ export default function AdminDashboard() {
                 </div>
 
                 <AnalyticsCharts userActivity={adminSummary.user_activity} />
-
-                <KeyManagementTable
-                    userActivity={adminSummary.user_activity}
-                    onRevokeKey={handleRevoke}
-                />
+                </div>
+                )}
             </main>
         </div>
     );

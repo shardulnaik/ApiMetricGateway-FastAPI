@@ -7,6 +7,7 @@ import { getUserKeys, generateUserKey } from '../../services/keyService';
 export default function UserDashboard() {
     const [keys, setKeys] = useState([]);
     const [selectedKey, setSelectedKey] = useState('');
+    const [showApiConsole, setShowApiConsole] = useState(false);
 
     const fetchKeys = async () => {
         try {
@@ -36,10 +37,13 @@ export default function UserDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900">
-            <Navbar />
-            <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-                <KeyList keys={keys} onGenerateKey={handleGenerateKey} />
-                <ApiConsole keys={keys} selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
+            <Navbar onSectionToggle={() => setShowApiConsole((current) => !current)} sectionLabel={showApiConsole ? 'My API Keys' : 'API Console'} />
+            <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
+                {showApiConsole ? (
+                    <ApiConsole keys={keys} selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
+                ) : (
+                    <KeyList keys={keys} onGenerateKey={handleGenerateKey} />
+                )}
             </main>
         </div>
     );
