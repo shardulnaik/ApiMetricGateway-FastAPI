@@ -1,7 +1,9 @@
-import React from 'react';
-import { Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Eye, EyeOff, Trash2 } from 'lucide-react';
 
 export default function KeyManagementTable({ userActivity, onRevokeKey }) {
+    const [visibleKeys, setVisibleKeys] = useState({});
+
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">User Key Control Table</h2>
@@ -27,11 +29,24 @@ export default function KeyManagementTable({ userActivity, onRevokeKey }) {
                             ) : (
                                 u.keys.map((k) => (
                                     <div key={k.id} className="flex items-center justify-between bg-gray-50 p-2.5 rounded border border-gray-200">
-                                        <span className="font-mono text-xs text-indigo-700">{k.key}</span>
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <span className="text-xs font-medium text-gray-800">API ID {k.id}</span>
+                                            <span className="font-mono text-xs text-indigo-700 truncate" aria-label={visibleKeys[k.id] ? 'API key' : 'Hidden API key'}>
+                                                {visibleKeys[k.id] ? k.key : '••••••••••••••••••••••••'}
+                                            </span>
+                                        </div>
                                         <div className="flex items-center space-x-3">
                                             <span className={`text-xs px-2 py-0.5 rounded font-medium ${k.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700'}`}>
                                                 {k.is_active ? 'Active' : 'Revoked'}
                                             </span>
+                                            <button
+                                                onClick={() => setVisibleKeys((current) => ({ ...current, [k.id]: !current[k.id] }))}
+                                                className="text-gray-500 hover:text-gray-900 p-1 rounded hover:bg-white transition"
+                                                title={visibleKeys[k.id] ? 'Hide API Key' : 'Reveal API Key'}
+                                                aria-label={visibleKeys[k.id] ? `Hide API key ${k.id}` : `Reveal API key ${k.id}`}
+                                            >
+                                                {visibleKeys[k.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            </button>
                                             {k.is_active && (
                                                 <button
                                                     onClick={() => onRevokeKey(k.id)}
