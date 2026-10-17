@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Navbar({ onSectionToggle, sectionLabel }) {
-    const { userRole, logout } = useAuth();
+    const { userRole, username, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const isAdmin = userRole === 'admin';
 
@@ -14,7 +14,7 @@ export default function Navbar({ onSectionToggle, sectionLabel }) {
                 <div className="flex items-center min-w-0 space-x-3">
                     {isAdmin ? <ShieldAlert className="w-7 h-7 text-indigo-700" /> : <Activity className="w-7 h-7 text-indigo-700" />}
                     <span className="text-lg sm:text-xl font-bold tracking-wider text-gray-900">
-                        APIMetric {isAdmin ? <span className="hidden sm:inline text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded ml-2">ADMIN ANALYTICS CONSOLE</span> : 'User Portal'}
+                        APIMetric {isAdmin ? <span className="hidden sm:inline text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded ml-2">ADMIN ANALYTICS CONSOLE</span> : <><span className="hidden sm:inline">User Portal</span>{username && <span className="ml-2 text-xs font-medium text-indigo-700">@{username}</span>}</>}
                     </span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2">

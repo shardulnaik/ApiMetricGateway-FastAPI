@@ -9,6 +9,7 @@ export default function AuthCard() {
     const { theme, toggleTheme } = useTheme();
     const [authMode, setAuthMode] = useState('login');
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [adminKeyInput, setAdminKeyInput] = useState('');
     const [authError, setAuthError] = useState('');
@@ -18,7 +19,7 @@ export default function AuthCard() {
         setAuthError('');
         try {
             if (authMode === 'register-user') {
-                await registerUser(email, password);
+                await registerUser(email, username, password);
                 setAuthMode('login');
                 setAuthError('Registration successful! Please log in.');
             } else if (authMode === 'register-admin') {
@@ -27,7 +28,7 @@ export default function AuthCard() {
                 setAuthError('Admin account created! Please log in.');
             } else {
                 const data = await loginUser(email, password);
-                saveAuth(data.access_token, data.role);
+                saveAuth(data.access_token, data.role, data.username);
             }
         } catch (err) {
             setAuthError(err.response?.data?.detail || 'Authentication failed');
@@ -79,17 +80,37 @@ export default function AuthCard() {
                 )}
 
                 <form onSubmit={handleAuth} className="space-y-4">
+                    {authMode === 'register-user' && (
+                        <div>
+                            <label className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Username</label>
+                            <input
+                                type="text"
+                                required
+                                minLength={3}
+                                maxLength={30}
+                                pattern="[A-Za-z0-9_.]+"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-4 text-gray-900 focus:outline-none focus:border-indigo-500"
+                                placeholder="e.g. alex_dev"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">3–30 characters: letters, numbers, dots, or underscores.</p>
+                        </div>
+                    )}
+
                     <div>
-                        <label className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Email</label>
+                        <label className="block text-xs uppercase tracking-wider text-gray-500 mb-1">
+                            {authMode === 'login' ? 'Username or email' : 'Email'}
+                        </label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
                             <input
-                                type="email"
+                                type={authMode === 'login' ? 'text' : 'email'}
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 pl-10 pr-4 text-gray-900 focus:outline-none focus:border-indigo-500"
-                                placeholder="developer@example.com"
+                                placeholder={authMode === 'login' ? 'Username or email' : 'developer@example.com'}
                             />
                         </div>
                     </div>

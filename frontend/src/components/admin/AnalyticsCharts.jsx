@@ -13,14 +13,14 @@ export default function AnalyticsCharts({ userActivity = [] }) {
     const gridColor = isDark ? '#374151' : '#e5e7eb';
     const borderColor = isDark ? '#374151' : '#d1d5db';
     const userChartData = userActivity.map((u) => ({
-        user: u.email.split('@')[0],
+        user: u.username || u.email.split('@')[0],
         requests: u.total_requests,
     }));
     const latencyData = userActivity
         .filter((user) => user.keys?.some((key) => key.is_active)
             && Number.isFinite(Number(user.avg_latency_ms))
             && Number(user.avg_latency_ms) > 0)
-        .map((user) => ({ user: user.email.split('@')[0], latency: Number(user.avg_latency_ms) }))
+        .map((user) => ({ user: user.username || user.email.split('@')[0], latency: Number(user.avg_latency_ms) }))
         .sort((a, b) => b.latency - a.latency);
 
     const tooltipStyle = {

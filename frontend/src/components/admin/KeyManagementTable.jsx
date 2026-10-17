@@ -13,7 +13,7 @@ export default function KeyManagementTable({ userActivity, onRevokeKey }) {
                         <div className="flex items-center justify-between border-b border-gray-200 pb-3">
                             <div>
                                 <span className="font-mono text-xs text-indigo-700 font-semibold mr-2">User #{u.user_id}</span>
-                                <span className="text-gray-900 font-semibold text-sm">{u.email}</span>
+                                <span className="text-gray-900 font-semibold text-sm">{u.username || u.email.split('@')[0]}</span>
                             </div>
                             <div className="flex space-x-4 text-xs">
                                 <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold border border-emerald-200">

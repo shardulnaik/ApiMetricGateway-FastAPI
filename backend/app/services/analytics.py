@@ -64,6 +64,7 @@ def calculate_admin_analytics(db: Session):
         user_activity.append({
             "user_id": int(user.id),
             "email": str(user.email),
+            "username": user.username,
             "keys": [{"id": key.id, "key": key.key, "is_active": key.is_active} for key in user_keys],
             "total_requests": request_count,
             "avg_latency_ms": avg_latency,
