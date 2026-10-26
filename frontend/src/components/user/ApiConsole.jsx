@@ -36,26 +36,26 @@ function ResultCard({ payload, service }) {
         title = data.symbol || 'Indian market index';
         subtitle = 'Indian stock market';
         metrics = [
-            { label: 'Current index value', value: `${Number(data.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })} points` },
+            { label: 'Index value', value: `${Number(data.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })} points` },
             { label: 'Change', value: data.change_percent == null ? 'Unavailable' : `${data.change_percent > 0 ? '+' : ''}${data.change_percent}%` },
         ];
         updated = `Last updated ${formatTimestamp(data.updated_at)}`;
     } else if (!error && service === 'currency') {
         title = 'USD to INR';
         subtitle = 'Exchange rate';
-        metrics = [{ label: '1 USD equals', value: `₹${Number(data.rate).toFixed(2)} INR` }];
+        metrics = [{ label: 'Exchange rate', value: `1 USD = ₹${Number(data.rate).toFixed(2)} INR` }];
         updated = `Rate date ${formatTimestamp(data.updated_at, true)} · Reference rate updates daily`;
     }
 
-    return <section className="result-card result-tone-neutral" aria-live="polite">
-        <div className="result-card-main"><div className="result-copy">
+    return <section className="live-result" aria-live="polite">
+        <div className="live-result-heading">
             <h3>{error ? 'Service unavailable' : title}</h3>
-            <p className="result-subtitle">{error || subtitle}</p>
-        </div></div>
-        {!error && <div className="result-metrics result-metrics-plain">
-            {metrics.map(({ label, value }) => <div className="result-metric" key={label}><span className="result-metric-label">{label}</span><strong>{value}</strong></div>)}
+            <p>{error || subtitle}</p>
+        </div>
+        {!error && <div className="live-result-values">
+            {metrics.map(({ label, value }) => <p key={label}><span>{label}</span><strong>{value}</strong></p>)}
         </div>}
-        {!error && <p className="result-updated">{updated}</p>}
+        {!error && <p className="live-result-updated">{updated}</p>}
     </section>;
 }
 
