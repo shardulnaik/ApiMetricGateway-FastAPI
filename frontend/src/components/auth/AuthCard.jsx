@@ -48,11 +48,11 @@ export default function AuthCard() {
             <button
                 onClick={toggleTheme}
                 aria-label="Toggle color theme" title="Toggle color theme"
-                className="absolute right-20 top-6 grid h-10 w-10 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-100"
+                className="nav-icon-button absolute right-20 top-6"
             >
                 <Sun className="h-4 w-4" />
             </button>
-            <button onClick={() => { const url = new URL(window.location.href); url.searchParams.set('about', '1'); window.open(url.toString(), '_blank'); }} aria-label="About" title="About" className="absolute right-6 top-6 grid h-10 w-10 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-100"><Info className="h-4 w-4" /></button>
+            <button onClick={() => { const url = new URL(window.location.href); url.searchParams.set('about', '1'); window.open(url.toString(), '_blank'); }} aria-label="About" title="About" className="nav-icon-button absolute right-6 top-6"><Info className="h-4 w-4" /></button>
             <div className="max-w-md w-full bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
                 <div className="flex items-center justify-center space-x-2 mb-6">
                     <span className="text-2xl font-bold tracking-wider text-gray-900">APIMetricGateway</span>

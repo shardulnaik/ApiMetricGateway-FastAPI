@@ -19,6 +19,14 @@ body {
 button, input, select { font: inherit; }
 button { cursor: pointer; }
 
+.nav-icon-button {
+  display: grid; width: 2.75rem; height: 2.75rem; place-items: center;
+  border: 1px solid #64748b; border-radius: .6rem; background: #fff;
+  color: #334155; transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.nav-icon-button:hover { background: #e0e7ff; border-color: #4f46e5; color: #312e81; }
+.nav-icon-button:focus-visible { outline: 3px solid #818cf8; outline-offset: 2px; }
+
 .service-tile {
   display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;
   padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.8rem;
@@ -113,6 +121,8 @@ button { cursor: pointer; }
 :root[data-theme="dark"] .result-metric-label { color: #9ca3af; }
 :root[data-theme="dark"] .result-metric { background: #111827a8; border-color: #374151; }
 :root[data-theme="dark"] .result-metric strong { color: #f9fafb; }
+:root[data-theme="dark"] .nav-icon-button { background: #1f2937; border-color: #64748b; color: #e2e8f0; }
+:root[data-theme="dark"] .nav-icon-button:hover { background: #3730a3; border-color: #a5b4fc; color: #fff; }
 
 @media (max-width: 480px) {
   .result-card-main { align-items: flex-start; padding: 1rem; gap: .75rem; }
