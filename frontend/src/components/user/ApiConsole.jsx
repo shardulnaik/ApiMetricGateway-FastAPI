@@ -31,9 +31,9 @@ function ResultCard({ payload, service }) {
             { label: 'Temperature', value: `${data.temperature_c} °C` },
             { label: 'Humidity', value: `${data.humidity_percent}%` },
         ];
-        updated = `Last updated ${formatTimestamp(data.updated_at)}`;
+        updated = `Last updated ${formatTimestamp(data.updated_at)} · Weather by ${data.data_source || 'weather provider'}`;
     } else if (!error && service === 'stock') {
-        title = 'NIFTY 50';
+        title = data.symbol || 'Indian market index';
         subtitle = 'Indian stock market';
         metrics = [
             { label: 'Current index value', value: `${Number(data.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })} points` },
