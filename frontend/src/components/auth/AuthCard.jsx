@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
-import { Activity, AlertCircle, Mail, Lock, ShieldAlert, Moon, Sun } from 'lucide-react';
+import { AlertCircle, Mail, Lock, ShieldAlert, Sun, LoaderCircle, Info } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { loginUser, registerUser, registerAdmin } from '../../services/authService';
 
 export default function AuthCard() {
     const { saveAuth } = useAuth();
-    const { theme, toggleTheme } = useTheme();
+    const { toggleTheme } = useTheme();
     const [authMode, setAuthMode] = useState('login');
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [adminKeyInput, setAdminKeyInput] = useState('');
     const [authError, setAuthError] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
 
     const handleAuth = async (e) => {
         e.preventDefault();
         setAuthError('');
+        setSubmitting(true);
+        const loaderTimer = setTimeout(() => setShowLoader(true), 1000);
         try {
             if (authMode === 'register-user') {
                 await registerUser(email, username, password);
@@ -32,6 +36,10 @@ export default function AuthCard() {
             }
         } catch (err) {
             setAuthError(err.response?.data?.detail || 'Authentication failed');
+        } finally {
+            clearTimeout(loaderTimer);
+            setShowLoader(false);
+            setSubmitting(false);
         }
     };
 
@@ -39,16 +47,15 @@ export default function AuthCard() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <button
                 onClick={toggleTheme}
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-                className="absolute right-6 top-6 flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 transition hover:bg-gray-100"
+                aria-label="Toggle color theme" title="Toggle color theme"
+                className="absolute right-20 top-6 grid h-10 w-10 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-100"
             >
-                {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+                <Sun className="h-4 w-4" />
             </button>
+            <button onClick={() => { const url = new URL(window.location.href); url.searchParams.set('about', '1'); window.open(url.toString(), '_blank'); }} aria-label="About" title="About" className="absolute right-6 top-6 grid h-10 w-10 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-100"><Info className="h-4 w-4" /></button>
             <div className="max-w-md w-full bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
                 <div className="flex items-center justify-center space-x-2 mb-6">
-                    <Activity className="w-8 h-8 text-indigo-700" />
-                    <span className="text-2xl font-bold tracking-wider text-gray-900">APIMetric Gateway</span>
+                    <span className="text-2xl font-bold tracking-wider text-gray-900">APIMetricGateway</span>
                 </div>
 
                 <div className="flex mb-6 border-b border-gray-200 text-xs font-semibold">
@@ -94,7 +101,6 @@ export default function AuthCard() {
                                 className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-4 text-gray-900 focus:outline-none focus:border-indigo-500"
                                 placeholder="e.g. alex_dev"
                             />
-                            <p className="mt-1 text-xs text-gray-500">3–30 characters: letters, numbers, dots, or underscores.</p>
                         </div>
                     )}
 
@@ -149,12 +155,13 @@ export default function AuthCard() {
 
                     <button
                         type="submit"
+                        disabled={submitting}
                         className={`w-full font-semibold py-2.5 rounded-lg transition duration-200 shadow-sm ${authMode === 'register-admin'
                             ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
                             : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
                             }`}
                     >
-                        {authMode === 'login' ? 'Sign In' : authMode === 'register-user' ? 'Create User Account' : 'Create Admin Account'}
+                        {showLoader ? <><LoaderCircle className="inline h-4 w-4 animate-spin mr-2" />{authMode === 'login' ? 'Signing in' : 'Creating account'}</> : authMode === 'login' ? 'Sign In' : authMode === 'register-user' ? 'Create User Account' : 'Create Admin Account'}
                     </button>
                 </form>
             </div>

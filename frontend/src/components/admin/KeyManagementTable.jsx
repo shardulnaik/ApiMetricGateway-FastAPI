@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function KeyManagementTable({ userActivity, onRevokeKey }) {
     const [visibleKeys, setVisibleKeys] = useState({});
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">User Key Control Table</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Key Management</h2>
             <div className="space-y-6">
                 {userActivity.map((u) => (
                     <div key={u.user_id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
                         <div className="flex items-center justify-between border-b border-gray-200 pb-3">
                             <div>
-                                <span className="font-mono text-xs text-indigo-700 font-semibold mr-2">User #{u.user_id}</span>
                                 <span className="text-gray-900 font-semibold text-sm">{u.username || u.email.split('@')[0]}</span>
                             </div>
                             <div className="flex space-x-4 text-xs">
                                 <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold border border-emerald-200">
                                     {u.total_requests} requests
                                 </span>
-                                <span className="text-gray-500">{u.avg_latency_ms} ms avg</span>
                             </div>
                         </div>
 
@@ -52,7 +50,6 @@ export default function KeyManagementTable({ userActivity, onRevokeKey }) {
                                                     onClick={() => onRevokeKey(k.id)}
                                                     className="flex items-center space-x-1 text-xs bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-2 py-1 rounded transition"
                                                 >
-                                                    <Trash2 className="w-3.5 h-3.5" />
                                                     <span>Revoke</span>
                                                 </button>
                                             )}

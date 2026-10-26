@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     ArrowDownRight, ArrowLeftRight, ArrowUpRight, Cloud, CloudSun, Droplets,
-    Minus, Play, Sun, TrendingDown, TrendingUp, MapPin, Activity,
+    Minus, TrendingDown, TrendingUp, Activity,
 } from 'lucide-react';
 import { executeTestEndpoint } from '../../services/keyService';
 
@@ -111,6 +111,7 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
     const [apiResponse, setApiResponse] = useState(null);
     const [activeService, setActiveService] = useState(null);
     const [loadingService, setLoadingService] = useState(null);
+    const [showLoader, setShowLoader] = useState(false);
 
     const handleTestEndpoint = async (service) => {
         if (!selectedKey) {
@@ -126,12 +127,15 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
         }
         setLoadingService(service.id);
         setApiResponse(null);
+        const loaderTimer = setTimeout(() => setShowLoader(true), 1000);
         try {
             const res = await executeTestEndpoint(service.endpoint, key.key);
             setApiResponse({ payload: res.data, status: res.status });
         } catch (err) {
             setApiResponse({ payload: err.response?.data || { error: 'Request failed. Please try again.' }, status: err.response?.status });
         } finally {
+            clearTimeout(loaderTimer);
+            setShowLoader(false);
             setLoadingService(null);
         }
     };
@@ -139,11 +143,7 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
             <div>
-                <h2 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
-                    <Play className="w-5 h-5 text-emerald-700" />
-                    <span>API Execution Console</span>
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">Run a service and see its response as a clear visual snapshot.</p>
+                <h2 className="text-lg font-bold text-gray-900">API Execution Console</h2>
             </div>
 
             <select value={selectedKey} onChange={(e) => setSelectedKey(e.target.value)} aria-label="Select API key"
@@ -157,7 +157,6 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
                     <article className={`service-tile service-${service.accent}`} key={service.id}>
                         <div>
                             <h3>{service.name} API</h3>
-                            <p>GET {service.endpoint}</p>
                         </div>
                         <button type="button" disabled={Boolean(loadingService)} onClick={() => handleTestEndpoint(service)}>
                             {loadingService === service.id ? 'Loading…' : `Execute ${service.name} Service`}
@@ -166,7 +165,7 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
                 ))}
             </div>
 
-            {loadingService && <div className="result-loading" role="status"><span /> Fetching {services.find((item) => item.id === loadingService)?.name.toLowerCase()} data…</div>}
+            {showLoader && loadingService && <div className="result-loading" role="status"><span /> Fetching {services.find((item) => item.id === loadingService)?.name.toLowerCase()} data...</div>}
             {apiResponse && activeService && <ResultCard result={apiResponse} payload={apiResponse.payload || apiResponse} service={activeService} />}
         </div>
     );

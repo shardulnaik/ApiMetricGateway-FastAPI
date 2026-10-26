@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Key, Copy, Check, Eye, EyeOff } from 'lucide-react';
+import { Copy, Check, Eye, EyeOff, Plus } from 'lucide-react';
 
-export default function KeyList({ keys, onGenerateKey }) {
+export default function KeyList({ keys, onGenerateKey, generating = false }) {
     const [copiedKey, setCopiedKey] = useState('');
     const [visibleKeys, setVisibleKeys] = useState({});
 
@@ -16,16 +16,16 @@ export default function KeyList({ keys, onGenerateKey }) {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
-                        <Key className="w-5 h-5 text-indigo-700" />
                         <span>My API Keys</span>
                     </h2>
-                    <p className="text-xs text-gray-500 mt-1">Generate and copy your credentials to access microservices.</p>
                 </div>
                 <button
                     onClick={onGenerateKey}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm px-4 py-2 rounded-lg transition shadow-sm"
+                    title="Generate New Key" aria-label="Generate New Key"
+                    disabled={generating}
+                    className="grid h-11 w-11 place-items-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition shadow-sm"
                 >
-                    + Generate New Key
+                    <Plus className="h-5 w-5" />
                 </button>
             </div>
 
