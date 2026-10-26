@@ -73,6 +73,9 @@ button { cursor: pointer; }
 .result-metric-label { display: flex; align-items: center; gap: .4rem; color: #64748b; font-size: .68rem; font-weight: 650; }
 .result-metric-label svg { width: .85rem; height: .85rem; color: var(--result-accent); }
 .result-metric strong { overflow-wrap: anywhere; color: #0f172a; font-size: 1rem; font-weight: 750; }
+.result-metrics-plain { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.result-metrics-plain .result-metric { padding: .2rem .8rem .65rem 0; border: 0; border-radius: 0; background: transparent; }
+.result-updated { margin: 0; padding: .7rem 1.35rem .9rem; color: #64748b; font-size: .72rem; }
 .result-footer { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem 1.35rem; border-top: 1px solid var(--result-border); color: #64748b; font-size: .7rem; }
 .payload-toggle { padding: .3rem 0; border: 0; background: transparent; color: var(--result-accent); font-size: .72rem; font-weight: 700; }
 .payload-toggle:hover { text-decoration: underline; }

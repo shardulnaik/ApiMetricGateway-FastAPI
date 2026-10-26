@@ -1,8 +1,4 @@
 import React, { useState } from 'react';
-import {
-    ArrowDownRight, ArrowLeftRight, ArrowUpRight, Cloud, CloudSun, Droplets,
-    Minus, TrendingDown, TrendingUp, Activity,
-} from 'lucide-react';
 import { executeTestEndpoint } from '../../services/keyService';
 
 const services = [
@@ -11,100 +7,56 @@ const services = [
     { id: 'currency', name: 'Currency', endpoint: '/api/v1/currency', accent: 'violet' },
 ];
 
-function describeResponse(service, data) {
-    if (!data || typeof data !== 'object' || data.error || data.detail) {
-        return { error: data?.error || data?.detail || 'The service did not return a usable response.' };
-    }
-
-    if (service === 'weather') {
-        const condition = String(data.condition || 'Weather').toLowerCase();
-        const rainy = /rain|storm|drizzle|shower|thunder/.test(condition);
-        const sunny = /sun|clear/.test(condition);
-        const Icon = rainy ? Droplets : sunny ? Sun : /cloud|overcast|fog|mist/.test(condition) ? Cloud : CloudSun;
-        return {
-            eyebrow: 'CURRENT CONDITIONS', title: data.condition || 'Conditions unavailable',
-            subtitle: data.location ? `Weather in ${data.location}` : 'Local weather',
-            Icon, tone: rainy ? 'blue' : sunny ? 'amber' : 'sky',
-            metrics: [
-                data.temperature != null && { label: 'Temperature', value: String(data.temperature).replace('Â°C', '°C') },
-                data.humidity != null && { label: 'Humidity', value: String(data.humidity), Icon: Droplets },
-            ].filter(Boolean),
-        };
-    }
-
-    if (service === 'stock') {
-        const change = Number.parseFloat(String(data.change ?? '').replace('%', ''));
-        const falling = Number.isFinite(change) && change < 0;
-        const rising = Number.isFinite(change) && change > 0;
-        return {
-            eyebrow: 'MARKET SNAPSHOT', title: data.symbol || 'Stock',
-            subtitle: data.market_status ? `Market ${String(data.market_status).toLowerCase()}` : 'Stock performance',
-            Icon: rising ? TrendingUp : falling ? TrendingDown : Activity,
-            tone: rising ? 'green' : falling ? 'red' : 'neutral',
-            badge: rising ? 'RISING' : falling ? 'FALLING' : 'STEADY',
-            metrics: [
-                data.price_inr != null && { label: 'Price', value: `₹${Number(data.price_inr).toLocaleString('en-IN', { maximumFractionDigits: 2 })}` },
-                data.change != null && { label: 'Change', value: String(data.change), Icon: rising ? ArrowUpRight : falling ? ArrowDownRight : Minus },
-            ].filter(Boolean),
-        };
-    }
-
-    if (service === 'currency') {
-        const rate = Number(data.rate);
-        const positive = Number.isFinite(rate) && rate > 0;
-        return {
-            eyebrow: 'CONVERSION RESULT', title: data.pair || 'Currency',
-            subtitle: 'Exchange rate', Icon: ArrowLeftRight, tone: 'violet',
-            metrics: [
-                Number.isFinite(rate) && { label: 'Rate', value: `${rate} ${data.pair || ''}`.trim() },
-                data.converted_amount != null && { label: 'Converted amount', value: String(data.converted_amount) },
-            ].filter(Boolean),
-            note: positive ? 'Conversion available' : null,
-        };
-    }
-    return { error: 'Unknown service response.' };
+function formatTimestamp(value, dateOnly = false) {
+    if (!value) return 'Time unavailable';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return new Intl.DateTimeFormat('en-IN', dateOnly
+        ? { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }
+        : { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' }
+    ).format(date);
 }
 
-function ResultCard({ result, payload, service }) {
-    const [showPayload, setShowPayload] = useState(false);
-    const view = describeResponse(service, payload);
-    const tone = view.tone || 'neutral';
-    const toneClasses = {
-        sky: 'result-tone-sky', amber: 'result-tone-amber', blue: 'result-tone-blue',
-        green: 'result-tone-green', red: 'result-tone-red', violet: 'result-tone-violet', neutral: 'result-tone-neutral',
-    };
-    const Icon = view.Icon || Activity;
+function ResultCard({ payload, service }) {
+    const data = payload;
+    const error = data?.detail || data?.error || (!data || typeof data !== 'object' ? 'The service did not return a usable response.' : null);
+    let title = '';
+    let subtitle = '';
+    let metrics = [];
+    let updated = '';
+    if (!error && service === 'weather') {
+        title = data.condition;
+        subtitle = `Weather in ${data.location}`;
+        metrics = [
+            { label: 'Temperature', value: `${data.temperature_c} °C` },
+            { label: 'Humidity', value: `${data.humidity_percent}%` },
+        ];
+        updated = `Last updated ${formatTimestamp(data.updated_at)}`;
+    } else if (!error && service === 'stock') {
+        title = 'NIFTY 50';
+        subtitle = 'Indian stock market';
+        metrics = [
+            { label: 'Current index value', value: `${Number(data.price).toLocaleString('en-IN', { maximumFractionDigits: 2 })} points` },
+            { label: 'Change', value: data.change_percent == null ? 'Unavailable' : `${data.change_percent > 0 ? '+' : ''}${data.change_percent}%` },
+        ];
+        updated = `Last updated ${formatTimestamp(data.updated_at)}`;
+    } else if (!error && service === 'currency') {
+        title = 'USD to INR';
+        subtitle = 'Exchange rate';
+        metrics = [{ label: '1 USD equals', value: `₹${Number(data.rate).toFixed(2)} INR` }];
+        updated = `Rate date ${formatTimestamp(data.updated_at, true)} · Reference rate updates daily`;
+    }
 
-    return (
-        <section className={`result-card ${toneClasses[tone]}`} aria-live="polite">
-            <div className="result-card-main">
-                <div className="result-symbol"><Icon aria-hidden="true" /></div>
-                <div className="result-copy">
-                    <p className="result-eyebrow">{view.eyebrow || 'SERVICE RESPONSE'}</p>
-                    <h3>{view.error ? 'Request needs attention' : view.title}</h3>
-                    <p className="result-subtitle">{view.error || view.subtitle}</p>
-                </div>
-                {view.badge && <span className="result-badge">{view.badge}</span>}
-            </div>
-            {!view.error && view.metrics?.length > 0 && (
-                <div className="result-metrics">
-                    {view.metrics.map(({ label, value, Icon: MetricIcon }) => (
-                        <div className="result-metric" key={label}>
-                            <span className="result-metric-label">{MetricIcon && <MetricIcon aria-hidden="true" />}{label}</span>
-                            <strong>{value}</strong>
-                        </div>
-                    ))}
-                </div>
-            )}
-            <div className="result-footer">
-                <span>{result?.status ? `HTTP ${result.status}` : view.note || 'Live service response'}</span>
-                <button type="button" className="payload-toggle" onClick={() => setShowPayload((open) => !open)} aria-expanded={showPayload}>
-                    {showPayload ? 'Hide raw response' : 'View raw response'}
-                </button>
-            </div>
-            {showPayload && <pre className="result-payload">{JSON.stringify(payload, null, 2)}</pre>}
-        </section>
-    );
+    return <section className="result-card result-tone-neutral" aria-live="polite">
+        <div className="result-card-main"><div className="result-copy">
+            <h3>{error ? 'Service unavailable' : title}</h3>
+            <p className="result-subtitle">{error || subtitle}</p>
+        </div></div>
+        {!error && <div className="result-metrics result-metrics-plain">
+            {metrics.map(({ label, value }) => <div className="result-metric" key={label}><span className="result-metric-label">{label}</span><strong>{value}</strong></div>)}
+        </div>}
+        {!error && <p className="result-updated">{updated}</p>}
+    </section>;
 }
 
 export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
@@ -130,9 +82,9 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
         const loaderTimer = setTimeout(() => setShowLoader(true), 1000);
         try {
             const res = await executeTestEndpoint(service.endpoint, key.key);
-            setApiResponse({ payload: res.data, status: res.status });
+            setApiResponse({ payload: res.data });
         } catch (err) {
-            setApiResponse({ payload: err.response?.data || { error: 'Request failed. Please try again.' }, status: err.response?.status });
+            setApiResponse({ payload: err.response?.data || { error: 'Request failed. Please try again.' } });
         } finally {
             clearTimeout(loaderTimer);
             setShowLoader(false);
@@ -142,31 +94,22 @@ export default function ApiConsole({ keys, selectedKey, setSelectedKey }) {
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-            <div>
-                <h2 className="text-lg font-bold text-gray-900">API Execution Console</h2>
-            </div>
-
+            <h2 className="text-lg font-bold text-gray-900">API Execution Console</h2>
             <select value={selectedKey} onChange={(e) => setSelectedKey(e.target.value)} aria-label="Select API key"
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-indigo-700 font-mono focus:outline-none focus:border-indigo-500">
                 <option value="">-- Select API Key --</option>
                 {keys.filter((k) => k.is_active).map((k) => <option key={k.id} value={String(k.id)}>API ID {k.id}</option>)}
             </select>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {services.map((service) => (
-                    <article className={`service-tile service-${service.accent}`} key={service.id}>
-                        <div>
-                            <h3>{service.name} API</h3>
-                        </div>
-                        <button type="button" disabled={Boolean(loadingService)} onClick={() => handleTestEndpoint(service)}>
-                            {loadingService === service.id ? 'Loading…' : `Execute ${service.name} Service`}
-                        </button>
-                    </article>
-                ))}
+                {services.map((service) => <article className={`service-tile service-${service.accent}`} key={service.id}>
+                    <h3>{service.name} API</h3>
+                    <button type="button" disabled={Boolean(loadingService)} onClick={() => handleTestEndpoint(service)}>
+                        {loadingService === service.id ? 'Loading...' : `Execute ${service.name} Service`}
+                    </button>
+                </article>)}
             </div>
-
             {showLoader && loadingService && <div className="result-loading" role="status"><span /> Fetching {services.find((item) => item.id === loadingService)?.name.toLowerCase()} data...</div>}
-            {apiResponse && activeService && <ResultCard result={apiResponse} payload={apiResponse.payload || apiResponse} service={activeService} />}
+            {apiResponse && activeService && <ResultCard payload={apiResponse.payload || apiResponse} service={activeService} />}
         </div>
     );
 }
